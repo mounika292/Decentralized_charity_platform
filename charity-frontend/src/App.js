@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import React, { useState, useEffect, useCallback } from 'react';
 import Web3 from 'web3';
 import CharityABI from './artifacts/contracts/Charity.sol/Charity.json';
@@ -13,10 +14,11 @@ function App() {
     const [donationStatus, setDonationStatus] = useState(null);
     const [donationHistory, setDonationHistory] = useState([]);
 
+    // Sample charities list with trustworthy status
     const charities = [
         { id: 1, name: 'Hope for Education', description: 'Education support for underprivileged children.', trustworthy: true },
-        { id: 2, name: 'Food for All', description: 'Food distribution in low-income communities.', trustworthy: true },
-        { id: 3, name: 'Animal Welfare Org', description: 'Animal protection and welfare services.', trustworthy: false },
+        { id: 2, name: 'Green Earth Initiative', description: 'Environmental conservation and reforestation.', trustworthy: true },
+        { id: 3, name: 'Health for All', description: 'Healthcare access for underserved communities.', trustworthy: true },
         { id: 4, name: 'Fake Fundraisers', description: 'Unverified charity', trustworthy: false },
         { id: 5, name: 'Clean Water Initiative', description: 'Providing clean and safe drinking water in remote areas.', trustworthy: true },
         { id: 6, name: 'Green Earth Project', description: 'Environmental conservation and reforestation efforts.', trustworthy: true },
@@ -34,7 +36,7 @@ function App() {
         { id: 18, name: 'Women’s Rights Advocacy', description: 'Empowering women through support and education.', trustworthy: true },
         { id: 19, name: 'Peacekeepers International', description: 'Promoting peace in conflict zones.', trustworthy: false },
         { id: 20, name: 'Local Community Builders', description: 'Building infrastructure in local communities.', trustworthy: true },
-        // Add more charities as needed
+
     ];
 
     const loadBlockchainData = useCallback(async () => {
@@ -97,16 +99,20 @@ function App() {
     const checkDonationStatus = async () => {
         if (contract && selectedCharity) {
             try {
-                const status = await contract.methods.hasReceivedDonation(selectedCharity.id).call();
-                setDonationStatus(status ? 'Donation received' : 'No donations received yet');
+                console.log("Attempting to check donation status for charity ID:", selectedCharity.id, "and account:", account);
+                
+                // Call the smart contract method
+                const status = await contract.methods.isDonationConfirmed(selectedCharity.id, account).call();
+                setDonationStatus(status ? 'Donation confirmed' : 'Donation not yet confirmed');
             } catch (error) {
-                console.error("Error checking donation status:", error);
+                console.error("Detailed error checking donation status:", error.message);
+                console.error("Full error object:", error);
                 setDonationStatus('Error checking status');
             }
         } else {
             alert("Please select a charity to check its donation status.");
         }
-    };
+    };    
 
     useEffect(() => {
         loadBlockchainData();
